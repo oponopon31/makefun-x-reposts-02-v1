@@ -52,11 +52,18 @@ if (posts.length > MAX_POSTS) {
   console.error(`POSTS.json names ${posts.length} posts; at most ${MAX_POSTS} are allowed.`);
   process.exit(1);
 }
+const seen = new Set<string>();
 for (const item of posts) {
   if (typeof item !== 'string' || !/x\.com|twitter\.com/.test(item)) {
     console.error(`Not an X post address: ${String(item)}`);
     process.exit(1);
   }
+  if (seen.has(item)) {
+    // The house reads a post named twice only once, so flag it here rather
+    // than silently handing in a shorter list than the writer expected.
+    console.warn(`Warning: ${item} is named twice; the house reads it once.`);
+  }
+  seen.add(item);
 }
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
